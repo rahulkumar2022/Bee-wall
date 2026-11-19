@@ -1,0 +1,40 @@
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import { chromium } from 'playwright';
+
+const url = new URL(process.argv[2] ?? 'https://rahulkumar2022.github.io/Bee-wall/');
+assert.equal(url.protocol,'https:','test the public HTTPS deployment');
+const solutions=JSON.parse(await readFile(new URL('../qa/solutions.json',import.meta.url),'utf8'));
+const browser=await chromium.launch();
+try {
+  const page=await browser.newPage({viewport:{width:1000,height:820}});
+  const errors=[],requests=[];
+  page.on('pageerror',e=>errors.push(e.message));
+  page.on('console',m=>{if(m.type()==='error') errors.push(m.text());});
+  page.on('request',r=>requests.push(r.url()));
+  await page.clock.install();
+  const response=await page.goto(url.href,{timeout:30000});
+  assert.equal(response?.status(),200);
+  assert.deepEqual(await response.body(),await readFile('dist/pages/index.html'),'public site must match the verified local web build');
+  await page.locator('#loading').waitFor({state:'hidden'});
+  assert.equal(await page.title(),'Bee Wall');
+  assert.equal(await page.locator('#stage').getAttribute('data-phase'),'draw');
+  const r=await page.locator('#board').boundingBox();assert.ok(r);
+  const points=solutions[0][1].map(([x,y])=>[r.x+x*r.width/360,r.y+y*r.height/640]);
+  await page.mouse.move(...points[0]);await page.mouse.down();
+  for(const p of points.slice(1)) await page.mouse.move(...p);
+  const idleClock=await page.locator('#clock').textContent();
+  await page.clock.runFor(6500);
+  assert.equal(await page.locator('#stage').getAttribute('data-phase'),'draw');
+  assert.equal(await page.locator('#clock').textContent(),idleClock);
+  await page.mouse.up();
+  assert.equal(await page.locator('#stage').getAttribute('data-phase'),'run');
+  await page.clock.runFor(5200);
+  await page.locator('#primary').waitFor({state:'visible'});
+  assert.equal(await page.locator('#result-title').textContent(),'Dog saved!');
+  await page.reload();await page.locator('#loading').waitFor({state:'hidden'});
+  assert.equal(await page.locator('#level-number').textContent(),'02');
+  assert.deepEqual(errors,[]);
+  assert.ok(requests.every(r=>new URL(r).origin===url.origin),'no game dependencies outside the Pages origin');
+  console.log(`PASS ${url.href} — matches local build, won level 1, restored level 2 after reload`);
+} finally {await browser.close();}

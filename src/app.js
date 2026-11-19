@@ -12,7 +12,7 @@ const ctx=board.getContext('2d',{alpha:false});
 const sound=createSound(), platform=createPlatform(), analytics=createAnalytics();
 const darkQuery=matchMedia('(prefers-color-scheme: dark)'), reducedQuery=matchMedia('(prefers-reduced-motion: reduce)');
 const worlds=['Meadow','Barn','Garden','Orchard'];
-const DEBUG=__STANDALONE__ && new URLSearchParams(location.search).has('debug');
+const DEBUG=__DEBUG_TOOLS__ && new URLSearchParams(location.search).has('debug');
 const failLines=['A bee slipped past the wall.','That bee found a gap.','The dog is okay. Try a new wall.'];
 const fails=new Map();
 const starPath='<svg class="star PLACEHOLDER" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3.2 6.5 7.2 1-5.2 5.1 1.3 7.3-6.5-3.5-6.5 3.5 1.3-7.3L1.6 9.5l7.2-1Z"/></svg>';
@@ -328,7 +328,7 @@ if (__STANDALONE__) {
   });
   window.addEventListener('pagehide',()=>endSession('pagehide'));
 }
-if(__STANDALONE__ && DEBUG) {
+if(__DEBUG_TOOLS__ && DEBUG) {
   byId('debug').hidden=false;
   window.BeeWallDebug=Object.freeze({
     snapshot:()=>({level:levelIndex+1,phase:game?.phase,time:game?.time,points:game?.points.length,ink:game?.ink,paused,fps}),

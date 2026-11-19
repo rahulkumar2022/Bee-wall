@@ -4,7 +4,10 @@ Bee Wall is an HTML5 puzzle for YouTube Playables. Draw one continuous ink wall 
 
 ## Play now
 
-If you cloned the source, run `npm ci` and `npm run build` first. Then open `dist/standalone/index.html` in a browser. It works from a file and uses no network. Use a finger, mouse, or stylus. R restarts an attempt; Escape closes a menu. The offline build saves to browser storage if available. If a browser blocks file-origin storage, use `npm run serve` and open the standalone URL instead.
+- [Play Bee Wall on GitHub Pages](https://rahulkumar2022.github.io/Bee-wall/)
+- [Download the YouTube Playables release ZIP](https://github.com/rahulkumar2022/Bee-wall/releases/latest)
+
+To play offline from a clone, run `npm ci` and `npm run build` first. Then open `dist/standalone/index.html` in a browser. It works from a file and uses no network. Use a finger, mouse, or stylus. R restarts an attempt; Escape closes a menu. The offline build saves to browser storage if available. If a browser blocks file-origin storage, use `npm run serve` and open the standalone URL instead.
 
 ## Build and test
 
@@ -21,6 +24,8 @@ npm run serve -- --csp
 ```
 
 `npm run build` generates the offline game and the Playables upload ZIP, `release/Bee-Wall-Playables-v1.0.0.zip`. The entry point is `index.html` at ZIP root. The only Playables network load is the required YouTube v1 SDK.[1][9] Progress is stored only via the SDK inside the platform; standalone storage is not used there.[2]
+
+For GitHub Pages, run `npm ci && npm run build:pages` from this directory. The command also builds the release ZIP and places the public web game in `dist/pages/`. The repository's Pages workflow tests and deploys that folder on pushes to `main`.[15] The web build needs no server or YouTube SDK and saves progress in the player's browser. Use `node scripts/hosted-qa.mjs` to smoke-test the live page against the local build.
 
 The board, portraits, effects and music are original vector and synthesized game assets. Baloo 2 is bundled under the SIL Open Font License; see `assets/OFL-Baloo2.txt`. No third-party analytics, ads, user accounts, cookies or personal identifiers are added by the game. Its internal gameplay events are available in the standalone debug build's in-memory buffer, not sent to a telemetry service.
 
@@ -41,3 +46,4 @@ Add `?debug=1` to the served standalone URL for FPS, bee count, remaining ink, a
 [2] https://developers.google.com/youtube/gaming/playables/certification/requirements_integration
 [5] https://developers.google.com/youtube/gaming/playables/reference/test_suite_guide
 [9] https://developers.google.com/youtube/gaming/playables/reference/getting_started
+[15] https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages
