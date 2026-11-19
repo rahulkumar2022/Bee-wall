@@ -1,0 +1,7 @@
+node_modules/
+dist/
+release/*
+!release/SUBMISSION.md
+!release/QA-REPORT.md
+qa/evidence/
+.DS_Store
